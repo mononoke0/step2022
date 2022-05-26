@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-
+# -*- coding: utf-8 -*-
 def read_number(line, index):
   number = 0
   while index < len(line) and line[index].isdigit():
@@ -13,6 +13,7 @@ def read_number(line, index):
       decimal /= 10
       index += 1
   token = {'type': 'NUMBER', 'number': number}
+  
   return token, index
 
 
@@ -25,6 +26,14 @@ def read_minus(line, index):
   token = {'type': 'MINUS'}
   return token, index + 1
 
+def read_mult(line, index):
+    token = {'type': 'MULT'}
+    return token, index + 1
+
+def read_division(line, index):
+    token = {'type': 'DIVISION'}
+    return token, index + 1
+
 
 def tokenize(line):
   tokens = []
@@ -36,23 +45,46 @@ def tokenize(line):
       (token, index) = read_plus(line, index)
     elif line[index] == '-':
       (token, index) = read_minus(line, index)
+    elif line[index] == '*':
+        (token, index) = read_mult(line, index)
+    elif line[index] == '/':
+        (token, index) = read_division(line, index)
     else:
       print('Invalid character found: ' + line[index])
       exit(1)
     tokens.append(token)
+    
   return tokens
 
 
-def evaluate(tokens):
+#'+', '-' を処理したtokensを返す
+def plus_minus_evaluate(tokens):
   answer = 0
-  tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
-  index = 1
-  while index < len(tokens):
+  #tokensの末尾にdummyの'+'を追加
+  #tokens.append({'type': 'PLUS'}) 
+  index = 0
+  #数字を表すtokenの要素の前の符号を確認：flg == 1 -> '+', flg == 0 -> '-'
+  flg = 1
+  #'-2+1', '-3+1'のように最初の数が負の値('-'から始まる)場合
+  if(tokens[index]['type'] == 'MINUS'):
+      flg = 0
+
+
+  while index < len(tokens)-1:
     if tokens[index]['type'] == 'NUMBER':
-      if tokens[index - 1]['type'] == 'PLUS':
-        answer += tokens[index]['number']
-      elif tokens[index - 1]['type'] == 'MINUS':
-        answer -= tokens[index]['number']
+      if tokens[index + 1]['type'] == 'PLUS':
+          if(flg == 1):
+              answer += tokens[index]['number']
+          else:
+              answer -= tokens[index]['number']
+          flg = 1
+      elif tokens[index + 1]['type'] == 'MINUS':
+          if(flg == 1):
+              answer += tokens[index]['number']
+          else:
+              answer -= tokens[index]['number']
+          flg = 0
+
       else:
         print('Invalid syntax')
         exit(1)
@@ -60,6 +92,41 @@ def evaluate(tokens):
   return answer
 
 
+#'*', '/' を処理したtokensを返す
+def mult_division_evaluate(tokens):
+    #'*', '/' はindex-2にアクセスするのでindexは2からスタート
+    index = 2
+    while index < len(tokens):
+        if tokens[index]['type'] == 'NUMBER':
+            if(tokens[index-1]['type']) == 'MULT':
+                tokens[index]['number'] *= tokens[index-2]['number']
+                #計算し終わったtokensの要素は{'type': 'dummy'}にかえる
+                tokens[index-2] = {'type': 'dummy'}
+                tokens[index-1] = {'type': 'dummy'}
+            elif(tokens[index-1]['type'] == 'DIVISION'):
+                tokens[index]['number'] = tokens[index-2]['number']/tokens[index]['number']
+                #計算し終わったtokensの要素は{'type': 'dummy'}にかえる
+                tokens[index-2] = {'type': 'dummy'}
+                tokens[index-1] = {'type': 'dummy'}
+        index += 1
+
+    return tokens
+
+#'+', '-', '*', '/' を処理した結果を返す
+def evaluate(tokens):
+    answer = 0
+    #'*', '/' を計算
+    tokens = mult_division_evaluate(tokens)
+    #tokensの末尾に'+'を追加
+    tokens.append({'type': 'PLUS'})
+    #'+', '-' を計算
+    answer = plus_minus_evaluate(tokens)
+
+    return answer
+
+
+
+                
 def test(line):
   tokens = tokenize(line)
   actual_answer = evaluate(tokens)
@@ -75,6 +142,20 @@ def run_test():
   print("==== Test started! ====")
   test("1+2")
   test("1.0+2.1-3")
+  test("1")
+  test("-1")
+  test("1*2+1")
+  test("1*2.0+1")
+  test("1+2*1")
+  test("1+2/3")
+  test("1+2.0/3")
+  test("9/3/2")
+  test("-1+1")
+  test("-1.0*2")
+  test("-3/2+1")
+  test("-3.0/2+1")
+
+
   print("==== Test finished! ====\n")
 
 run_test()
