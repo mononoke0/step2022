@@ -219,7 +219,7 @@ def evaluate(tokens):
 #正しい数式か確認(2++2, 2+-2など、符号が連続していないか)
 def check_true_numerical_formula(tokens):
   #符号で式が終わる場合
-  if (tokens[-1]['type'] == 'PLUS') or (tokens[-1]['type'] == 'MINUS') or (tokens[-1]['type'] == 'MULT') or (tokens[-1]['type'] == 'DIVISION'):
+  if (tokens[-1]['type'] == 'PLUS') or (tokens[-1]['type'] == 'MINUS') or (tokens[-1]['type'] == 'MULT') or (tokens[-1]['type'] == 'DIVISION') or (tokens[-1]['type'] == 'OPEN PARENTHESIS'):
     print("FAIL! \nMust be a number at the end position of the numerical formula.")
     return 0
 
