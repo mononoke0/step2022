@@ -256,7 +256,7 @@ def test(line):
       else:
         print("FAIL! (%s should be %f but was %f)" % (line, expected_answer, actual_answer))
   else:
-    print("FAIL! (%s should be %f)" % (line, expected_answer))
+    print("FAIL! (%s 's form is wrong. )" % line )
     return 
 
 
