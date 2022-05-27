@@ -244,11 +244,11 @@ def test(line):
   tokens = tokenize(line)
 
   check = check_true_numerical_formula(tokens)
-  print("after")
   if check == 1:
     actual_answer = evaluate_polling(tokens)
     expected_answer = eval(line)
     if actual_answer == None:
+      print("FAIL! (%s should be %f but was %f)" % (line, expected_answer, actual_answer))
       print("cannot return answer. the form of parentheses is wrong.")
     else:
       if abs(actual_answer - expected_answer) < 1e-8:
@@ -256,6 +256,7 @@ def test(line):
       else:
         print("FAIL! (%s should be %f but was %f)" % (line, expected_answer, actual_answer))
   else:
+    print("FAIL! (%s should be %f)" % (line, expected_answer))
     return 
 
 
