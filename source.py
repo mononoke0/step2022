@@ -26,7 +26,7 @@ def read_minus(line, index):
   token = {'type': 'MINUS'}
   return token, index + 1
 
-<<<<<<< HEAD
+
 def read_mult(line, index):
     token = {'type': 'MULT'}
     return token, index + 1
@@ -34,16 +34,16 @@ def read_mult(line, index):
 def read_division(line, index):
     token = {'type': 'DIVISION'}
     return token, index + 1
-=======
+
 def read_open_parenthesis(line, index):
-  token = {'type': 'OPEN PARENTHESIS', 'NUMBER': index}
+  token = {'type': 'OPEN PARENTHESIS', 'index': index}
   return token, index + 1
 
 def read_close_parenthesis(line, index):
-  token = {'type': 'CLOSE PARENTHESIS', 'NUMBER': index}
+  token = {'type': 'CLOSE PARENTHESIS', 'index': index}
   return token, index + 1
 
->>>>>>> polling
+
 
 
 def tokenize(line):
@@ -56,17 +56,15 @@ def tokenize(line):
       (token, index) = read_plus(line, index)
     elif line[index] == '-':
       (token, index) = read_minus(line, index)
-<<<<<<< HEAD
     elif line[index] == '*':
         (token, index) = read_mult(line, index)
     elif line[index] == '/':
         (token, index) = read_division(line, index)
-=======
     elif line[index] == '(':
       (token, index) = read_open_parenthesis(line, index)
     elif line[index] == ')':
       (token, index) = read_close_parenthesis(line, index)
->>>>>>> polling
+
     else:
       print('Invalid character found: ' + line[index])
       exit(1)
@@ -120,49 +118,54 @@ class Stack:
     self.stack.append(index)
 
   def pop(self):
-    if self.stack.len()>0:
+    if len(self.stack)>0:
       self.stack.pop()
       self.top -= 1
     else:
-      print("Error: ')' doesn't correspond to '(' ")
+      print("pop Error: ')' doesn't correspond to '(' ")
 
   def check(self):
-    if self.stack.top == self.stack.bottom:
-      print("OK")
+    if self.top == self.bottom:
+      #flag : 1-> ok, 0->failed
+      return 1 
     else:
       print("Error: ')' doesn't correspond to '(' ")
-
-
+      return 0
+      
 
 
 #'()'に対応したevaluate
 def evaluate_polling(tokens):
-  tokens.insert({'type': 'OPEN PARENTHESIS', 'index': 0})
-  tokens.append({'type': 'CLOSE PARENTHESIS', 'index': tokens.len()})
+  tokens.insert(0, {'type': 'OPEN PARENTHESIS', 'index': 0})
+  tokens.append({'type': 'CLOSE PARENTHESIS', 'index': len(tokens)})
   parentheses_stack = Stack()
   index = 0
   while index < len(tokens):
-    if(tokens[index][type] == 'OPEN PARENTHESIS'):
+    if(tokens[index]['type'] == 'OPEN PARENTHESIS'):
+      print("pushed. ", tokens[index]['index']) #######################
       parentheses_stack.push(index)
-    if (tokens[index][type] == 'CLOSE PARENTHESIS'):
+    if (tokens[index]['type'] == 'CLOSE PARENTHESIS'):
       tokens_inside_parentheses = []
-      for i in range(tokens[index]['index'], index):
+      for i in range(parentheses_stack.stack[-1]+1, index):
         tokens_inside_parentheses.append(tokens[i])
       answer = evaluate(tokens_inside_parentheses)
+      print("answer: ", answer)
       new_tokens = []
-      for i in range(0, tokens[index]['index']):
+      for i in range(0, parentheses_stack.stack[-1]):
         new_tokens.append(tokens[i])
       new_tokens.append({'type': 'NUMBER', 'number': answer})
-      for i in range(index+1, tokens.len()):
+      for i in range(index+1, len(tokens)):
         new_tokens.append(tokens[i])
-      index = tokens[index]['index']
+      index = parentheses_stack.stack[-1]
       tokens = new_tokens
+      parentheses_stack.pop()
+      print("poped.")  ################################
     index += 1
-  parentheses_stack.check()
+  flg = parentheses_stack.check()
+  if flg == 0:
+    answer = None
 
   return answer
-
-
 
 
 
@@ -203,7 +206,7 @@ def evaluate(tokens):
                 
 def test(line):
   tokens = tokenize(line)
-  actual_answer = evaluate(tokens)
+  actual_answer = evaluate_polling(tokens)
   expected_answer = eval(line)
   if abs(actual_answer - expected_answer) < 1e-8:
     print("PASS! (%s = %f)" % (line, expected_answer))
@@ -238,5 +241,8 @@ while True:
   print('> ', end="")
   line = input()
   tokens = tokenize(line)
-  answer = evaluate(tokens)
-  print("answer = %f\n" % answer)
+  answer = evaluate_polling(tokens)
+  if answer != None:
+    print("answer = %f\n" % answer)
+  else:
+    print("cannot return answer")
