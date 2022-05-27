@@ -124,6 +124,31 @@ def evaluate(tokens):
 
     return answer
 
+#正しい数式か確認(2++2, 2+-2など、符号が連続していないか)
+def check_true_numerical_formula(tokens):
+  #符号で式が終わる場合
+  if tokens[-1]['type'] != 'NUMBER' :
+    print(" must be a number at the end position of the numerical formula.")
+    return 0
+
+  index = 0
+  check = 0
+  while index<len(tokens):
+    if (tokens[index]['type'] == 'PLUS') or (tokens[index]['type'] == 'MINUS') or (tokens[index]['type'] == 'MULT') or (tokens[index]['type'] == 'DIVISION'):
+      check += 1
+    if (tokens[index]['type'] == 'NUMBER'):
+      check = 0
+    if check > 1:
+      print (" this numerical formula is wrong.  plus or minus signs are connected. ")
+      return 0
+
+    #0で割る場合
+    if (tokens[index]['type'] == 'DIVISION') and (tokens[index+1]['type'] == 'NUMBER') and (tokens[index+1]['number'] == 0):
+      print (" cannot divide the numerical formula by 0.")
+      return 0
+    index += 1
+
+  return 1
 
 
                 
