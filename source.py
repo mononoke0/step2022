@@ -218,7 +218,6 @@ def check_true_numerical_formula(tokens):
   #符号で式が終わる場合
   if tokens[-1]['type'] != 'NUMBER' :
     print(" must be a number at the end position of the numerical formula.")
-    print("in")
     return 0
 
   index = 0
@@ -245,6 +244,7 @@ def test(line):
   tokens = tokenize(line)
 
   check = check_true_numerical_formula(tokens)
+  print("after")
   if check == 1:
     actual_answer = evaluate_polling(tokens)
     expected_answer = eval(line)
