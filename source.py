@@ -156,7 +156,6 @@ def evaluate_polling(tokens):
         tokens_inside_parentheses.append(tokens[i])
       #()の内側のtokenのリストを計算
       answer = evaluate(tokens_inside_parentheses)
-      print("answer: ", answer)
       #()を処理済みのtokens(new_tokens)を新たに作成
       new_tokens = []
       for i in range(0, parentheses_stack.stack[-1]):
