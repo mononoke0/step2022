@@ -231,7 +231,7 @@ def check_true_numerical_formula(tokens):
     if (tokens[index]['type'] == 'NUMBER'):
       check = 0
     if check > 1:
-      print ("FAIL! \nThis numerical formula is wrong.  Plus or minus signs are connected. ")
+      print ("FAIL! \nThis numerical formula is wrong.  '+' or '-' or '*' or '/' signs are connected. ")
       return 0
       
     #0で割る場合
