@@ -173,7 +173,7 @@ def evaluate_polling(tokens):
       else:
         answer = None
         break
-      index += 1
+    index += 1
   #'(', ')'が対応しているか、スタックの中身で確認
   flg = parentheses_stack.check()
   if flg == 0:
