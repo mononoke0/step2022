@@ -26,6 +26,7 @@ def read_minus(line, index):
   token = {'type': 'MINUS'}
   return token, index + 1
 
+<<<<<<< HEAD
 def read_mult(line, index):
     token = {'type': 'MULT'}
     return token, index + 1
@@ -33,6 +34,16 @@ def read_mult(line, index):
 def read_division(line, index):
     token = {'type': 'DIVISION'}
     return token, index + 1
+=======
+def read_open_parenthesis(line, index):
+  token = {'type': 'OPEN PARENTHESIS', 'NUMBER': index}
+  return token, index + 1
+
+def read_close_parenthesis(line, index):
+  token = {'type': 'CLOSE PARENTHESIS', 'NUMBER': index}
+  return token, index + 1
+
+>>>>>>> polling
 
 
 def tokenize(line):
@@ -45,10 +56,17 @@ def tokenize(line):
       (token, index) = read_plus(line, index)
     elif line[index] == '-':
       (token, index) = read_minus(line, index)
+<<<<<<< HEAD
     elif line[index] == '*':
         (token, index) = read_mult(line, index)
     elif line[index] == '/':
         (token, index) = read_division(line, index)
+=======
+    elif line[index] == '(':
+      (token, index) = read_open_parenthesis(line, index)
+    elif line[index] == ')':
+      (token, index) = read_close_parenthesis(line, index)
+>>>>>>> polling
     else:
       print('Invalid character found: ' + line[index])
       exit(1)
@@ -90,6 +108,62 @@ def plus_minus_evaluate(tokens):
         exit(1)
     index += 1
   return answer
+
+class Stack:
+  def __init__(self):
+    self.stack = []
+    self.top = 0
+    self.bottom  = 0
+  
+  def push(self, index):
+    self.top += 1 #リストのindex+1
+    self.stack.append(index)
+
+  def pop(self):
+    if self.stack.len()>0:
+      self.stack.pop()
+      self.top -= 1
+    else:
+      print("Error: ')' doesn't correspond to '(' ")
+
+  def check(self):
+    if self.stack.top == self.stack.bottom:
+      print("OK")
+    else:
+      print("Error: ')' doesn't correspond to '(' ")
+
+
+
+
+#'()'に対応したevaluate
+def evaluate_polling(tokens):
+  tokens.insert({'type': 'OPEN PARENTHESIS', 'index': 0})
+  tokens.append({'type': 'CLOSE PARENTHESIS', 'index': tokens.len()})
+  parentheses_stack = Stack()
+  index = 0
+  while index < len(tokens):
+    if(tokens[index][type] == 'OPEN PARENTHESIS'):
+      parentheses_stack.push(index)
+    if (tokens[index][type] == 'CLOSE PARENTHESIS'):
+      tokens_inside_parentheses = []
+      for i in range(tokens[index]['index'], index):
+        tokens_inside_parentheses.append(tokens[i])
+      answer = evaluate(tokens_inside_parentheses)
+      new_tokens = []
+      for i in range(0, tokens[index]['index']):
+        new_tokens.append(tokens[i])
+      new_tokens.append({'type': 'NUMBER', 'number': answer})
+      for i in range(index+1, tokens.len()):
+        new_tokens.append(tokens[i])
+      index = tokens[index]['index']
+      tokens = new_tokens
+    index += 1
+  parentheses_stack.check()
+
+  return answer
+
+
+
 
 
 #'*', '/' を処理したtokensを返す
