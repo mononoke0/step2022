@@ -60,14 +60,36 @@ def evaluate(tokens):
   return answer
 
 
+def check_true_numerical_formula(tokens):
+  index = 0
+  check = 0
+  while index<len(tokens):
+    if (tokens[index]['type'] == 'PLUS') or (tokens[index]['type'] == 'MINUS'):
+      check += 1
+    if (tokens[index]['type'] == 'NUMBER'):
+      check = 0
+
+    if check > 1:
+      print (" this numerical formula is wrong.")
+      return 0
+    
+    index += 1
+
+  return 1
+
+
 def test(line):
   tokens = tokenize(line)
-  actual_answer = evaluate(tokens)
-  expected_answer = eval(line)
-  if abs(actual_answer - expected_answer) < 1e-8:
-    print("PASS! (%s = %f)" % (line, expected_answer))
+  check = check_true_numerical_formula(tokens)
+  if check == 1:
+    actual_answer = evaluate(tokens)
+    expected_answer = eval(line)
+    if abs(actual_answer - expected_answer) < 1e-8:
+      print("PASS! (%s = %f)" % (line, expected_answer))
+    else:
+      print("FAIL! (%s should be %f but was %f)" % (line, expected_answer, actual_answer))
   else:
-    print("FAIL! (%s should be %f but was %f)" % (line, expected_answer, actual_answer))
+    return 
 
 
 # Add more tests to this function :)
@@ -83,5 +105,9 @@ while True:
   print('> ', end="")
   line = input()
   tokens = tokenize(line)
-  answer = evaluate(tokens)
-  print("answer = %f\n" % answer)
+  check = check_true_numerical_formula(tokens)
+  if check  == 1:
+    answer = evaluate(tokens)
+    print("answer = %f\n" % answer)
+  else:
+    pass
