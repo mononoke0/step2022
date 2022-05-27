@@ -189,5 +189,11 @@ while True:
   print('> ', end="")
   line = input()
   tokens = tokenize(line)
-  answer = evaluate(tokens)
-  print("answer = %f\n" % answer)
+  check = check_true_numerical_formula(tokens)
+  if check  == 1:
+    answer = evaluate(tokens)
+    print("answer = %f\n" % answer)
+  else:
+    pass
+
+ 
