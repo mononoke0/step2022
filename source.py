@@ -36,11 +36,11 @@ def read_division(line, index):
     return token, index + 1
 
 def read_open_parenthesis(line, index):
-  token = {'type': 'OPEN PARENTHESIS', 'index': index}
+  token = {'type': 'OPEN PARENTHESIS'}
   return token, index + 1
 
 def read_close_parenthesis(line, index):
-  token = {'type': 'CLOSE PARENTHESIS', 'index': index}
+  token = {'type': 'CLOSE PARENTHESIS'}
   return token, index + 1
 
 
@@ -76,8 +76,6 @@ def tokenize(line):
 #'+', '-' を処理したtokensを返す
 def plus_minus_evaluate(tokens):
   answer = 0
-  #tokensの末尾にdummyの'+'を追加
-  #tokens.append({'type': 'PLUS'}) 
   index = 0
   #数字を表すtokenの要素の前の符号を確認：flg == 1 -> '+', flg == 0 -> '-'
   flg = 1
@@ -85,10 +83,11 @@ def plus_minus_evaluate(tokens):
   if(tokens[index]['type'] == 'MINUS'):
       flg = 0
 
-
   while index < len(tokens)-1:
     if tokens[index]['type'] == 'NUMBER':
+      #後ろに'+', '-'のついている数字を読む(`*`, '/'の処理時に、計算結果aがaの計算に使用したtokensの要素数の分だけ、aa...と重複してtokensに存在するため)
       if tokens[index + 1]['type'] == 'PLUS':
+          #'+', '-'のどちらを行うかはflgで確認
           if(flg == 1):
               answer += tokens[index]['number']
           else:
@@ -105,16 +104,18 @@ def plus_minus_evaluate(tokens):
         print('Invalid syntax')
         exit(1)
     index += 1
+
   return answer
 
+#'(', ')'をスタックを使用して対応させる
 class Stack:
   def __init__(self):
     self.stack = []
-    self.top = 0
+    self.top = 0 
     self.bottom  = 0
   
   def push(self, index):
-    self.top += 1 #リストのindex+1
+    self.top += 1 
     self.stack.append(index)
 
   def pop(self):
@@ -122,9 +123,11 @@ class Stack:
       self.stack.pop()
       self.top -= 1
     else:
+      #')'に対応する'('が足りない場合
       print("pop Error: ')' doesn't correspond to '(' ")
 
   def check(self):
+    #スタックの中身が空になっているか
     if self.top == self.bottom:
       #flag : 1-> ok, 0->failed
       return 1 
@@ -136,31 +139,39 @@ class Stack:
 
 #'()'に対応したevaluate
 def evaluate_polling(tokens):
+  #数式の先頭に'(', 末尾に')'を追加
   tokens.insert(0, {'type': 'OPEN PARENTHESIS', 'index': 0})
   tokens.append({'type': 'CLOSE PARENTHESIS', 'index': len(tokens)})
+  #スタックの作成
   parentheses_stack = Stack()
   index = 0
   while index < len(tokens):
     if(tokens[index]['type'] == 'OPEN PARENTHESIS'):
-      print("pushed. ", tokens[index]['index']) #######################
+      #スタックに'('のindexを追加
       parentheses_stack.push(index)
     if (tokens[index]['type'] == 'CLOSE PARENTHESIS'):
+      #tokens_inside_parentheses：()の内側のtokenのリスト
       tokens_inside_parentheses = []
       for i in range(parentheses_stack.stack[-1]+1, index):
         tokens_inside_parentheses.append(tokens[i])
+      #()の内側のtokenのリストを計算
       answer = evaluate(tokens_inside_parentheses)
       print("answer: ", answer)
+      #()を処理済みのtokens(new_tokens)を新たに作成
       new_tokens = []
       for i in range(0, parentheses_stack.stack[-1]):
         new_tokens.append(tokens[i])
       new_tokens.append({'type': 'NUMBER', 'number': answer})
       for i in range(index+1, len(tokens)):
         new_tokens.append(tokens[i])
+      #新しいtokensに対応したindexに更新
       index = parentheses_stack.stack[-1]
+      #tokensを新しいものに更新
       tokens = new_tokens
+      #処理した')'に対応するスタックの要素をpop
       parentheses_stack.pop()
-      print("poped.")  ################################
     index += 1
+  #'(', ')'が対応しているか、スタックの中身で確認
   flg = parentheses_stack.check()
   if flg == 0:
     answer = None
@@ -202,7 +213,7 @@ def evaluate(tokens):
     return answer
 
 
-
+#正しい数式か確認(2++2, 2+-2など、符号が連続していないか)
 def check_true_numerical_formula(tokens):
   index = 0
   check = 0
