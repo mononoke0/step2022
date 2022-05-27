@@ -150,26 +150,30 @@ def evaluate_polling(tokens):
       #スタックに'('のindexを追加
       parentheses_stack.push(index)
     if (tokens[index]['type'] == 'CLOSE PARENTHESIS'):
-      #tokens_inside_parentheses：()の内側のtokenのリスト
-      tokens_inside_parentheses = []
-      for i in range(parentheses_stack.stack[-1]+1, index):
-        tokens_inside_parentheses.append(tokens[i])
-      #()の内側のtokenのリストを計算
-      answer = evaluate(tokens_inside_parentheses)
-      #()を処理済みのtokens(new_tokens)を新たに作成
-      new_tokens = []
-      for i in range(0, parentheses_stack.stack[-1]):
-        new_tokens.append(tokens[i])
-      new_tokens.append({'type': 'NUMBER', 'number': answer})
-      for i in range(index+1, len(tokens)):
-        new_tokens.append(tokens[i])
-      #新しいtokensに対応したindexに更新
-      index = parentheses_stack.stack[-1]
-      #tokensを新しいものに更新
-      tokens = new_tokens
-      #処理した')'に対応するスタックの要素をpop
-      parentheses_stack.pop()
-    index += 1
+      if len(parentheses_stack.stack) > 0 :
+        #tokens_inside_parentheses：()の内側のtokenのリスト
+        tokens_inside_parentheses = []
+        for i in range(parentheses_stack.stack[-1]+1, index):
+          tokens_inside_parentheses.append(tokens[i])
+        #()の内側のtokenのリストを計算
+        answer = evaluate(tokens_inside_parentheses)
+        #()を処理済みのtokens(new_tokens)を新たに作成
+        new_tokens = []
+        for i in range(0, parentheses_stack.stack[-1]):
+          new_tokens.append(tokens[i])
+        new_tokens.append({'type': 'NUMBER', 'number': answer})
+        for i in range(index+1, len(tokens)):
+          new_tokens.append(tokens[i])
+        #新しいtokensに対応したindexに更新
+        index = parentheses_stack.stack[-1]
+        #tokensを新しいものに更新
+        tokens = new_tokens
+        #処理した')'に対応するスタックの要素をpop
+        parentheses_stack.pop()
+      else:
+        answer = None
+        break
+      index += 1
   #'(', ')'が対応しているか、スタックの中身で確認
   flg = parentheses_stack.check()
   if flg == 0:
