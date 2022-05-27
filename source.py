@@ -220,7 +220,7 @@ def evaluate(tokens):
 def check_true_numerical_formula(tokens):
   #符号で式が終わる場合
   if (tokens[-1]['type'] == 'PLUS') or (tokens[-1]['type'] == 'MINUS') or (tokens[-1]['type'] == 'MULT') or (tokens[-1]['type'] == 'DIVISION'):
-    print(" must be a number at the end position of the numerical formula.")
+    print("FAIL! must be a number at the end position of the numerical formula.")
     return 0
 
   index = 0
@@ -231,12 +231,12 @@ def check_true_numerical_formula(tokens):
     if (tokens[index]['type'] == 'NUMBER'):
       check = 0
     if check > 1:
-      print (" this numerical formula is wrong.  plus or minus signs are connected. ")
+      print ("FAIL! this numerical formula is wrong.  plus or minus signs are connected. ")
       return 0
       
     #0で割る場合
     if (tokens[index]['type'] == 'DIVISION') and (tokens[index+1]['type'] == 'NUMBER') and (tokens[index+1]['number'] == 0):
-      print (" cannot divide the numerical formula by 0.")
+      print ("FAIL! cannot divide the numerical formula by 0.")
       return 0
     index += 1
 
@@ -251,8 +251,7 @@ def test(line):
     actual_answer = evaluate_polling(tokens)
     expected_answer = eval(line)
     if actual_answer == None:
-      print("FAIL! (%s should be %f but was %f)" % (line, expected_answer, actual_answer))
-      print("cannot return answer. the form of parentheses is wrong.")
+      print("FAIL! cannot return answer. the form of parentheses is wrong.")
     else:
       if abs(actual_answer - expected_answer) < 1e-8:
         print("PASS! (%s = %f)" % (line, expected_answer))
@@ -489,6 +488,6 @@ while True:
     if answer != None:
       print("answer = %f\n" % answer)
     else:
-      print("cannot return answer. the form of parentheses is wrong.")
+      print("FAIL! cannot return answer. the form of parentheses is wrong.")
   else:
     pass
